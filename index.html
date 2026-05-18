@@ -27,18 +27,17 @@ body{
 }
 
 .box{
-  background:#fff;
+  background:white;
   padding:30px;
   border-radius:15px;
   text-align:center;
 }
 
 .login-btn{
-  background:linear-gradient(45deg,#d4af37,#ffd700);
+  background:linear-gradient(45deg,gold,#d4af37);
   border:none;
   padding:12px;
   border-radius:10px;
-  width:100%;
 }
 
 /* APP */
@@ -46,45 +45,62 @@ body{
   display:none;
   max-width:500px;
   margin:30px auto;
-  background:#fff;
+  background:white;
   padding:20px;
   border-radius:15px;
 }
 
+/* TOPO */
 .topo{
   display:flex;
   justify-content:space-between;
   align-items:center;
 }
 
-select{
-  padding:8px;
-  border-radius:8px;
-}
-
-.btn-fechar{
-  background:#c2185b;
-  color:white;
-  border:none;
-  padding:8px;
-  border-radius:8px;
-}
-
-input, button{
-  width:100%;
-  padding:10px;
+.menu-meses{
+  display:flex;
+  gap:5px;
+  overflow-x:auto;
   margin-top:10px;
-  border-radius:10px;
 }
 
+.menu-meses button{
+  padding:6px 10px;
+  border:none;
+  border-radius:8px;
+  background:#eee;
+}
+
+.menu-meses .ativo{
+  background:gold;
+}
+
+/* BOTÕES */
 .add{
-  background:linear-gradient(45deg,#d4af37,#ffd700);
+  background:linear-gradient(45deg,gold,#d4af37);
 }
 
 .remover{
-  background:red;
+  background:#c2185b;
   color:white;
   margin-left:10px;
+  padding:4px 8px;
+  border:none;
+  border-radius:6px;
+}
+
+.fechar{
+  background:black;
+  color:white;
+  padding:6px;
+  border-radius:6px;
+}
+
+input,button{
+  width:100%;
+  margin-top:10px;
+  padding:10px;
+  border-radius:10px;
 }
 
 .total{
@@ -100,7 +116,7 @@ input, button{
 <div class="login" id="login">
   <div class="box">
     <h2>💎 Controle Financeiro</h2>
-    <button class="login-btn" onclick="login()">🔐 Entrar com Google</button>
+    <button class="login-btn" onclick="login()">Entrar com Google</button>
   </div>
 </div>
 
@@ -108,30 +124,19 @@ input, button{
 <div class="app" id="app">
 
 <div class="topo">
-  <select id="mes" onchange="trocarMes()">
-    <option value="01">Janeiro</option>
-    <option value="02">Fevereiro</option>
-    <option value="03">Março</option>
-    <option value="04">Abril</option>
-    <option value="05">Maio</option>
-    <option value="06">Junho</option>
-    <option value="07">Julho</option>
-    <option value="08">Agosto</option>
-    <option value="09">Setembro</option>
-    <option value="10">Outubro</option>
-    <option value="11">Novembro</option>
-    <option value="12">Dezembro</option>
-  </select>
-
-  <button class="btn-fechar" onclick="fecharMes()">🔒</button>
+  <h3 id="mesAtual">Janeiro</h3>
+  <button class="fechar" onclick="fecharMes()">🔒 Fechar</button>
 </div>
+
+<!-- MENU DE MESES -->
+<div class="menu-meses" id="menuMeses"></div>
 
 <p id="user"></p>
 
 <input id="desc" placeholder="Descrição">
 <input id="val" type="number" placeholder="Valor">
 
-<button class="add" onclick="adicionar()">➕ Adicionar</button>
+<button class="add" onclick="adicionar()">Adicionar</button>
 
 <ul id="lista"></ul>
 <div class="total" id="total"></div>
@@ -154,104 +159,133 @@ let usuario = null;
 let mesAtual = "01";
 let fechado = false;
 
+const meses = [
+"Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+"Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
+];
+
 /* LOGIN */
 auth.onAuthStateChanged(user=>{
-  if(user){
-    usuario=user;
-    document.getElementById("login").style.display="none";
-    document.getElementById("app").style.display="block";
-    document.getElementById("user").innerText=user.email;
+ if(user){
+   usuario=user;
+   document.getElementById("login").style.display="none";
+   document.getElementById("app").style.display="block";
+   document.getElementById("user").innerText=user.email;
 
-    carregar();
-  }else{
-    login();
-  }
+   criarMenu();
+   selecionarMes("01");
+ }else{
+   login();
+ }
 });
 
+/* LOGIN */
 function login(){
-  const provider=new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider);
+ const provider=new firebase.auth.GoogleAuthProvider();
+ auth.signInWithPopup(provider);
+}
+
+/* MENU */
+function criarMenu(){
+ let menu=document.getElementById("menuMeses");
+ menu.innerHTML="";
+
+ meses.forEach((nome,i)=>{
+   let btn=document.createElement("button");
+   let num=(i+1).toString().padStart(2,"0");
+
+   btn.innerText=nome;
+   btn.onclick=()=>selecionarMes(num);
+
+   menu.appendChild(btn);
+ });
 }
 
 /* TROCAR MÊS */
-function trocarMes(){
-  mesAtual=document.getElementById("mes").value;
-  verificarMes();
+function selecionarMes(num){
+ mesAtual=num;
+
+ document.querySelectorAll(".menu-meses button")
+ .forEach((b,i)=>{
+   b.classList.toggle("ativo", i+1==num);
+ });
+
+ document.getElementById("mesAtual").innerText=meses[num-1];
+
+ verificarFechamento();
 }
 
 /* VERIFICAR SE FECHADO */
-function verificarMes(){
-  db.collection("meses")
-  .doc(usuario.uid+"_"+mesAtual)
-  .get()
-  .then(doc=>{
-    fechado=doc.exists;
-    carregar();
-  });
+function verificarFechamento(){
+ db.collection("meses")
+ .doc(usuario.uid+"_"+mesAtual)
+ .get()
+ .then(doc=>{
+   fechado=doc.exists;
+   carregar();
+ });
 }
 
 /* FECHAR MÊS */
 function fecharMes(){
-  db.collection("meses")
-  .doc(usuario.uid+"_"+mesAtual)
-  .set({fechado:true});
+ db.collection("meses")
+ .doc(usuario.uid+"_"+mesAtual)
+ .set({fechado:true});
 
-  fechado=true;
-  alert("Mês fechado!");
-  carregar();
+ fechado=true;
+ alert("Mês fechado!");
+ carregar();
 }
 
 /* CARREGAR */
 function carregar(){
-  db.collection("despesas")
-  .where("user","==",usuario.uid)
-  .where("mes","==",mesAtual)
-  .get()
-  .then(snapshot=>{
+ db.collection("despesas")
+ .where("user","==",usuario.uid)
+ .where("mes","==",mesAtual)
+ .get()
+ .then(snapshot=>{
 
-    let lista="";
-    let total=0;
+   let lista="";
+   let total=0;
 
-    snapshot.forEach(doc=>{
-      let d=doc.data();
-      total+=d.valor;
+   snapshot.forEach(doc=>{
+     let d=doc.data();
+     total+=d.valor;
 
-      lista+=`
-      <li>
-        ${d.descricao} - R$ ${d.valor}
-        ${fechado ? "" : `<button class="remover" onclick="remover('${doc.id}')">❌</button>`}
-      </li>`;
-    });
+     lista+=`
+     <li>
+       ${d.descricao} - R$ ${d.valor}
+       ${fechado ? "" : `<button class="remover" onclick="remover('${doc.id}')">Remover</button>`}
+     </li>`;
+   });
 
-    document.getElementById("lista").innerHTML=lista;
-    document.getElementById("total").innerText="💰 R$ "+total.toFixed(2);
-  });
+   document.getElementById("lista").innerHTML=lista;
+   document.getElementById("total").innerText="Total: R$ "+total.toFixed(2);
+ });
 }
 
 /* ADICIONAR */
 function adicionar(){
 
-  if(fechado) return alert("Mês fechado!");
+ if(fechado) return alert("Mês fechado!");
 
-  let desc=document.getElementById("desc").value;
-  let val=parseFloat(document.getElementById("val").value);
+ let desc=document.getElementById("desc").value;
+ let val=parseFloat(document.getElementById("val").value);
 
-  if(!desc||isNaN(val)) return alert("Preencha");
+ if(!desc||isNaN(val)) return alert("Preencha");
 
-  db.collection("despesas").add({
-    descricao:desc,
-    valor:val,
-    user:usuario.uid,
-    mes:mesAtual
-  }).then(()=>carregar());
+ db.collection("despesas").add({
+   descricao:desc,
+   valor:val,
+   user:usuario.uid,
+   mes:mesAtual
+ }).then(()=>carregar());
 }
 
 /* REMOVER */
 function remover(id){
-  if(fechado) return;
-
-  db.collection("despesas").doc(id).delete()
-  .then(()=>carregar());
+ db.collection("despesas").doc(id).delete()
+ .then(()=>carregar());
 }
 </script>
 
