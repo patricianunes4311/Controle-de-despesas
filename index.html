@@ -2,158 +2,220 @@
 <html lang="pt-br">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Despesas</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle de Despesas</title>
 
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-analytics.js";
-        // TODO: Add SDKs for Firebase products that you want to use
-        // https://firebase.google.com/docs/web/setup#available-libraries
+<!-- ✅ Firebase CORRETO -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-        // Your web app's Firebase configuration
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-        const firebaseConfig = {
-            apiKey: "AIzaSyDzPAdEz9KZcosVz76EAjoqLPZ_CLlLDbs",
-            authDomain: "controle-de-despesas-d337d.firebaseapp.com",
-            projectId: "controle-de-despesas-d337d",
-            storageBucket: "controle-de-despesas-d337d.firebasestorage.app",
-            messagingSenderId: "193503396678",
-            appId: "1:193503396678:web:1d6da798b3c07284dcdb47",
-            measurementId: "G-KHV3XKFDMR"
-        };
+<style>
+body{
+  font-family: Arial;
+  margin:0;
+  background: linear-gradient(135deg,#fff0f5,#fce4ec);
+}
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-    </script>
+/* LOGIN */
+.login{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
 
+.box{
+  background:#fff;
+  padding:30px;
+  border-radius:15px;
+  width:300px;
+  text-align:center;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
+}
 
+.box h2{
+  color:#c2185b;
+}
 
+.login-btn{
+  background:linear-gradient(45deg,#d4af37,#ffd700);
+  border:none;
+  padding:12px;
+  border-radius:10px;
+  width:100%;
+  font-weight:bold;
+  margin-top:15px;
+  cursor:pointer;
+}
 
+/* APP */
+.app{
+  display:none;
+  max-width:500px;
+  margin:30px auto;
+  background:#fff;
+  padding:20px;
+  border-radius:15px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
+}
 
-    <style>
-        body {
-            font-family: Arial;
-            margin: 0;
-            background: linear-gradient(135deg, #fff0f5, #fce4ec);
-        }
+h1{
+  color:#c2185b;
+}
 
-        .container {
-            max-width: 500px;
-            margin: 30px auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-        }
+input, button{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  border-radius:10px;
+  border:1px solid #ddd;
+}
 
-        button,
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 8px;
-        }
+.add{
+  background:linear-gradient(45deg,#d4af37,#ffd700);
+  border:none;
+}
 
-        button {
-            background: #c2185b;
-            color: white;
-            border: none;
-        }
-    </style>
+.logout{
+  background:#c2185b;
+  color:white;
+  border:none;
+}
+
+.remover{
+  background:#c2185b;
+  color:white;
+  margin-left:10px;
+}
+
+.total{
+  margin-top:15px;
+  font-weight:bold;
+}
+</style>
 </head>
 
 <body>
 
-    <div class="container">
-        <h2>💸 Controle com Login</h2>
+<!-- LOGIN -->
+<div class="login" id="login">
+  <div class="box">
+    <h2>💎 Controle Financeiro</h2>
+    <p>Faça login para continuar</p>
+    <button class="login-btn" onclick="login()">🔐 Entrar com Google</button>
+  </div>
+</div>
 
-        <button onclick="login()">🔐 Entrar com Google</button>
-        <button onclick="logout()">🚪 Sair</button>
+<!-- APP -->
+<div class="app" id="app">
+  <h1>💸 Despesas</h1>
+  <p id="user"></p>
 
-        <p id="user"></p>
+  <input id="desc" placeholder="Descrição">
+  <input id="val" type="number" placeholder="Valor">
 
-        <input type="text" id="desc" placeholder="Descrição">
-        <input type="number" id="val" placeholder="Valor">
-        <button onclick="adicionar()">➕ Adicionar</button>
+  <button class="add" onclick="adicionar()">➕ Adicionar</button>
+  <button class="logout" onclick="logout()">🚪 Sair</button>
 
-        <ul id="lista"></ul>
-        <h3 id="total"></h3>
-    </div>
+  <ul id="lista"></ul>
+  <div class="total" id="total"></div>
+</div>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "COLE_AQUI",
-            authDomain: "controle-de-despesas-d337d.firebaseapp.com",
-            projectId: "controle-de-despesas-d337d",
-            storageBucket: "controle-de-despesas-d337d.appspot.com",
-            messagingSenderId: "COLE_AQUI",
-            appId: "COLE_AQUI"
-        };
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDzPAdEz9KZcosVz76EAjoqLPZ_CLlLDbs",
+  authDomain: "controle-de-despesas-d337d.firebaseapp.com",
+  projectId: "controle-de-despesas-d337d",
+  storageBucket: "controle-de-despesas-d337d.appspot.com",
+  messagingSenderId: "193503396678",
+  appId: "1:193503396678:web:1d6da798b3c07284dcdb47"
+};
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
+firebase.initializeApp(firebaseConfig);
 
-        let usuario = null;
+const db = firebase.firestore();
+const auth = firebase.auth();
 
-        auth.onAuthStateChanged(u => {
-            usuario = u;
-            if (u) {
-                document.getElementById('user').innerText = "Usuário: " + u.email;
-                carregar();
-            }
-        });
+let usuario = null;
 
-        function login() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider);
-        }
+/* ✅ ESTADO LOGIN */
+auth.onAuthStateChanged(user=>{
+  usuario = user;
 
-        function logout() { auth.signOut(); }
+  if(user){
+    document.getElementById("login").style.display="none";
+    document.getElementById("app").style.display="block";
 
-        function carregar() {
-            db.collection("despesas").where("user", "==", usuario.uid)
-                .onSnapshot(snapshot => {
-                    const lista = document.getElementById('lista');
-                    lista.innerHTML = '';
-                    let total = 0;
+    document.getElementById("user").innerText="👤 "+user.email;
+    carregar();
+  }else{
+    document.getElementById("login").style.display="flex";
+    document.getElementById("app").style.display="none";
+  }
+});
 
-                    snapshot.forEach(doc => {
-                        const d = doc.data();
-                        total += d.valor;
-                        lista.innerHTML += `
-      <li>${d.descricao} - R$ ${d.valor}
-      <button onclick="remover('${doc.id}')">❌</button></li>`;
-                    });
+/* ✅ LOGIN (FUNCIONA EM CELULAR) */
+function login(){
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithRedirect(provider);
+}
 
-                    document.getElementById('total').innerText = "Total: R$ " + total.toFixed(2);
-                });
-        }
+/* LOGOUT */
+function logout(){
+  auth.signOut();
+}
 
-        function adicionar() {
-            if (!usuario) return alert('Faça login');
+/* CARREGAR DADOS */
+function carregar(){
+  db.collection("despesas")
+  .where("user","==",usuario.uid)
+  .onSnapshot(snapshot=>{
 
-            const desc = document.getElementById('desc').value;
-            const val = parseFloat(document.getElementById('val').value);
+    let lista = document.getElementById("lista");
+    lista.innerHTML="";
+    let total=0;
 
-            if (!desc || isNaN(val)) return alert('Preencha');
+    snapshot.forEach(doc=>{
+      let d=doc.data();
+      total+=d.valor;
 
-            db.collection("despesas").add({
-                descricao: desc,
-                valor: val,
-                user: usuario.uid
-            });
+      lista.innerHTML+=`
+      <li>
+        ${d.descricao} - R$ ${d.valor}
+        <button class="remover" onclick="remover('${doc.id}')">❌</button>
+      </li>`;
+    });
 
-            document.getElementById('desc').value = '';
-            document.getElementById('val').value = '';
-        }
+    document.getElementById("total").innerText="💰 Total: R$ "+total.toFixed(2);
+  });
+}
 
-        function remover(id) { db.collection("despesas").doc(id).delete(); }
-    </script>
+/* ADICIONAR */
+function adicionar(){
+  if(!usuario) return alert("Faça login");
+
+  let desc=document.getElementById("desc").value;
+  let val=parseFloat(document.getElementById("val").value);
+
+  if(!desc || isNaN(val)) return alert("Preencha");
+
+  db.collection("despesas").add({
+    descricao:desc,
+    valor:val,
+    user:usuario.uid
+  });
+
+  document.getElementById("desc").value="";
+  document.getElementById("val").value="";
+}
+
+/* REMOVER */
+function remover(id){
+  db.collection("despesas").doc(id).delete();
+}
+</script>
 
 </body>
-
 </html>
