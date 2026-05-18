@@ -13,12 +13,13 @@ body {
   height:100vh;
   background: linear-gradient(135deg,#fff0f5,#fce4ec);
   overflow:hidden;
+  transition:0.3s;
 }
 
 /* MENU */
 .menu {
   width:220px;
-  background:#c2185b;
+  background:linear-gradient(180deg,#c2185b,#880e4f);
   color:#fff;
   padding:15px;
   transition:0.3s;
@@ -26,34 +27,35 @@ body {
   overflow-y:auto;
 }
 
-.menu.closed {
-  width:70px;
-}
+.menu.closed { width:70px; }
 
 .menu button {
   width:100%;
   margin-bottom:10px;
-  background:#880e4f;
+  background:#fff2;
   color:white;
   border:none;
-  padding:8px;
+  padding:10px;
   cursor:pointer;
+  border-radius:10px;
 }
 
-.menu ul {
-  list-style:none;
-  padding:0;
-}
+.menu ul { list-style:none; padding:0; }
 
 .menu li {
   margin:10px 0;
   cursor:pointer;
-  padding:5px;
-  border-radius:5px;
+  padding:8px;
+  border-radius:8px;
+  transition:0.3s;
+  display:flex;
+  align-items:center;
+  gap:8px;
 }
 
 .menu li:hover {
-  background:#880e4f;
+  background:#ffffff33;
+  transform:translateX(4px);
 }
 
 /* CONTAINER */
@@ -65,6 +67,12 @@ body {
   border-radius:12px;
   box-shadow:0 8px 20px rgba(0,0,0,0.1);
   overflow:auto;
+  animation:fade 0.5s;
+}
+
+@keyframes fade {
+  from {opacity:0; transform:translateY(10px);} 
+  to {opacity:1;}
 }
 
 h1 {
@@ -74,21 +82,24 @@ h1 {
 
 input, button {
   width:100%;
-  padding:10px;
+  padding:12px;
   margin-top:10px;
-  border-radius:8px;
+  border-radius:10px;
   border:1px solid #ddd;
+  font-size:14px;
 }
 
 button {
   background:linear-gradient(45deg,#d4af37,#ffd700);
   color:white;
   border:none;
+  font-weight:bold;
+  transition:0.3s;
 }
 
-.fechar {
-  background:#c2185b;
-}
+button:hover { transform:scale(1.03); }
+
+.fechar { background:#c2185b; }
 
 /* TABELA */
 table {
@@ -104,62 +115,60 @@ th, td {
 
 tr:hover {
   background:#fff5f8;
+  transition:0.3s;
 }
 
 .remover-btn {
   background:#c2185b;
   color:white;
   border:none;
-  padding:5px 10px;
-  border-radius:5px;
+  padding:6px 12px;
+  border-radius:8px;
   cursor:pointer;
+  transition:0.2s;
+}
+
+.remover-btn:hover {
+  background:#880e4f;
+  transform:scale(1.05);
 }
 
 .total {
   margin-top:15px;
   font-weight:bold;
+  font-size:18px;
 }
 
-/* RESPONSIVO */
+/* MOBILE */
 @media (max-width:600px){
-
   body {
-    flex-direction: column;
-    height: auto;
-    overflow: auto;
+    flex-direction:column;
+    height:auto;
+    overflow:auto;
   }
 
   .menu {
-    width: 100%;
-    height: auto;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    display: block;
-  }
-
-  .menu button {
-    border-radius: 10px;
+    width:100%;
+    height:auto;
+    position:sticky;
+    top:0;
+    z-index:10;
   }
 
   .menu ul {
-    display: flex;
-    overflow-x: auto;
-    gap: 8px;
-    padding-top: 10px;
+    display:flex;
+    overflow-x:auto;
+    gap:8px;
+    padding-top:10px;
   }
 
   .menu li {
-    flex: none;
-    background: #880e4f;
-    padding: 8px 12px;
-    border-radius: 8px;
-    white-space: nowrap;
-    font-size: 14px;
+    flex:none;
+    background:#ffffff22;
   }
 
   .container {
-    margin: 10px;
+    margin:10px;
   }
 }
 </style>
@@ -170,28 +179,31 @@ tr:hover {
 <div class="menu" id="menu">
   <button onclick="toggleMenu()">☰ Menu</button>
   <ul>
-      <li onclick="trocarMes('2026-12')">Dezembro 2026</li>
-    <li onclick="trocarMes('2026-11')">Novembro 2026</li>
-    <li onclick="trocarMes('2026-10')">Outubro 2026</li>
-    <li onclick="trocarMes('2026-09')">Setembro 2026</li>
-    <li onclick="trocarMes('2026-08')">Agosto 2026</li>
-    <li onclick="trocarMes('2026-06')">Junho 2026</li>
-    <li onclick="trocarMes('2026-05')">Maio 2026</li>
-    <li onclick="trocarMes('2026-04')">Abril 2026</li>
-    <li onclick="trocarMes('2026-03')">Março 2026</li>
-    <li onclick="trocarMes('2026-02')">Fevereiro 2026</li>
-    <li onclick="trocarMes('2026-01')">Janeiro 2026</li>
+    <li onclick="trocarMes('2026-12')">📅 Dezembro</li>
+    <li onclick="trocarMes('2026-11')">📅 Novembro</li>
+    <li onclick="trocarMes('2026-10')">📅 Outubro</li>
+    <li onclick="trocarMes('2026-09')">📅 Setembro</li>
+    <li onclick="trocarMes('2026-08')">📅 Agosto</li>
+    <li onclick="trocarMes('2026-07')">📅 Julho</li>
+    <li onclick="trocarMes('2026-06')">📅 Junho</li>
+    <li onclick="trocarMes('2026-05')">📅 Maio</li>
+    <li onclick="trocarMes('2026-04')">📅 Abril</li>
+    <li onclick="trocarMes('2026-03')">📅 Março</li>
+    <li onclick="trocarMes('2026-02')">📅 Fevereiro</li>
+    <li onclick="trocarMes('2026-01')">📅 Janeiro</li>
+
   </ul>
 </div>
 
 <div class="container">
-  <h1>Controle de Despesas</h1>
+  <h1>💸 Controle de Despesas</h1>
   <h3 id="mesAtual"></h3>
 
-  <input type="text" id="descricao" placeholder="Descrição">
-  <input type="number" id="valor" placeholder="Valor">
-  <button onclick="adicionar()">Adicionar</button>
-  <button class="fechar" onclick="fecharMes()">Fechar mês</button>
+  <input type="text" id="descricao" placeholder="📝 Descrição">
+  <input type="number" id="valor" placeholder="💰 Valor">
+  
+  <button onclick="adicionar()">➕ Adicionar</button>
+  <button class="fechar" onclick="fecharMes()">🔒 Fechar mês</button>
 
   <table>
     <thead>
@@ -222,30 +234,27 @@ function salvarDados(dados){
   localStorage.setItem(mesAtual, JSON.stringify(dados));
 }
 
-function formatar(v){
-  return v.toFixed(2).replace('.',',');
-}
+function formatar(v){ return v.toFixed(2).replace('.',','); }
 
 function render(){
   const lista = document.getElementById('lista');
   lista.innerHTML = '';
   let total=0;
 
-  document.getElementById('mesAtual').innerText = 'Mês atual: ' + mesAtual;
+  document.getElementById('mesAtual').innerText = '📆 Mês atual: ' + mesAtual;
 
   const despesas = carregarDados();
 
   despesas.forEach((d,i)=>{
     total+=d.valor;
-
     lista.innerHTML+=`<tr>
       <td>${d.descricao}</td>
       <td>R$ ${formatar(d.valor)}</td>
-      <td><button class="remover-btn" onclick="remover(${i})">Remover</button></td>
+      <td><button class="remover-btn" onclick="remover(${i})">❌ Remover</button></td>
     </tr>`;
   });
 
-  document.getElementById('total').innerText=`Total: R$ ${formatar(total)}`;
+  document.getElementById('total').innerText=`💰 Total: R$ ${formatar(total)}`;
 }
 
 function adicionar(){
@@ -255,7 +264,6 @@ function adicionar(){
   }
 
   let despesas = carregarDados();
-
   const desc=document.getElementById('descricao').value;
   const val=parseFloat(document.getElementById('valor').value);
 
@@ -289,10 +297,7 @@ function fecharMes(){
   alert('Mês fechado!');
 }
 
-function trocarMes(mes){
-  mesAtual = mes;
-  render();
-}
+function trocarMes(mes){ mesAtual = mes; render(); }
 
 render();
 </script>
