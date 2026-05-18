@@ -6,26 +6,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Controle de Despesas</title>
 
+<!-- ✅ SCRIPTS FIREBASE CORRETOS -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <style>
-body{
+body {
   font-family: Arial;
-  margin:0;
+  margin: 0;
   background: linear-gradient(135deg,#fff0f5,#fce4ec);
 }
 
 /* LOGIN */
-.login{
+.login {
   height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
 }
 
-.box{
+.box {
   background:#fff;
   padding:30px;
   border-radius:15px;
@@ -34,11 +35,11 @@ body{
   box-shadow:0 10px 25px rgba(0,0,0,0.1);
 }
 
-.box h2{
+.box h2 {
   color:#c2185b;
 }
 
-.login-btn{
+.login-btn {
   background:linear-gradient(45deg,#d4af37,#ffd700);
   border:none;
   padding:12px;
@@ -50,7 +51,7 @@ body{
 }
 
 /* APP */
-.app{
+.app {
   display:none;
   max-width:500px;
   margin:30px auto;
@@ -60,11 +61,11 @@ body{
   box-shadow:0 10px 25px rgba(0,0,0,0.1);
 }
 
-h1{
+h1 {
   color:#c2185b;
 }
 
-input, button{
+input, button {
   width:100%;
   padding:10px;
   margin-top:10px;
@@ -72,24 +73,25 @@ input, button{
   border:1px solid #ddd;
 }
 
-.add{
+.add {
   background:linear-gradient(45deg,#d4af37,#ffd700);
   border:none;
 }
 
-.logout{
+.logout {
   background:#c2185b;
   color:white;
   border:none;
 }
 
-.remover{
+.remover {
   background:#c2185b;
   color:white;
   margin-left:10px;
+  border:none;
 }
 
-.total{
+.total {
   margin-top:15px;
   font-weight:bold;
 }
@@ -140,22 +142,21 @@ const auth = firebase.auth();
 let usuario = null;
 
 /* ✅ ESTADO LOGIN */
-auth.onAuthStateChanged(user=>{
+auth.onAuthStateChanged(user => {
   usuario = user;
 
   if(user){
     document.getElementById("login").style.display="none";
     document.getElementById("app").style.display="block";
-
     document.getElementById("user").innerText="👤 "+user.email;
     carregar();
-  }else{
+  } else {
     document.getElementById("login").style.display="flex";
     document.getElementById("app").style.display="none";
   }
 });
 
-/* ✅ LOGIN (FUNCIONA EM CELULAR) */
+/* ✅ LOGIN */
 function login(){
   const provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithRedirect(provider);
@@ -166,28 +167,28 @@ function logout(){
   auth.signOut();
 }
 
-/* CARREGAR DADOS */
+/* CARREGAR */
 function carregar(){
   db.collection("despesas")
-  .where("user","==",usuario.uid)
-  .onSnapshot(snapshot=>{
+    .where("user","==",usuario.uid)
+    .onSnapshot(snapshot => {
 
     let lista = document.getElementById("lista");
-    lista.innerHTML="";
-    let total=0;
+    lista.innerHTML = "";
+    let total = 0;
 
-    snapshot.forEach(doc=>{
-      let d=doc.data();
-      total+=d.valor;
+    snapshot.forEach(doc => {
+      let d = doc.data();
+      total += d.valor;
 
-      lista.innerHTML+=`
-      <li>
-        ${d.descricao} - R$ ${d.valor}
-        <button class="remover" onclick="remover('${doc.id}')">❌</button>
-      </li>`;
+      lista.innerHTML += `
+        <li>
+          ${d.descricao} - R$ ${d.valor}
+          <button class="remover" onclick="remover('${doc.id}')">❌</button>
+        </li>`;
     });
 
-    document.getElementById("total").innerText="💰 Total: R$ "+total.toFixed(2);
+    document.getElementById("total").innerText = "💰 Total: R$ " + total.toFixed(2);
   });
 }
 
@@ -195,19 +196,19 @@ function carregar(){
 function adicionar(){
   if(!usuario) return alert("Faça login");
 
-  let desc=document.getElementById("desc").value;
-  let val=parseFloat(document.getElementById("val").value);
+  let desc = document.getElementById("desc").value;
+  let val = parseFloat(document.getElementById("val").value);
 
   if(!desc || isNaN(val)) return alert("Preencha");
 
   db.collection("despesas").add({
-    descricao:desc,
-    valor:val,
-    user:usuario.uid
+    descricao: desc,
+    valor: val,
+    user: usuario.uid
   });
 
-  document.getElementById("desc").value="";
-  document.getElementById("val").value="";
+  document.getElementById("desc").value = "";
+  document.getElementById("val").value = "";
 }
 
 /* REMOVER */
