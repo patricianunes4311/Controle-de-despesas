@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Controle de Despesas</title>
 
-<!-- ✅ FIREBASE -->
+<!-- ✅ Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -73,7 +73,6 @@ input,button{
 
 .add{
   background:linear-gradient(45deg,#d4af37,#ffd700);
-  border:none;
 }
 
 .logout{
@@ -138,63 +137,36 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 let usuario = null;
-let unsubscribe = null; // ✅ controlar listener
 
+/* ✅ LOGIN / ESTADO */
 auth.onAuthStateChanged(user => {
+
   usuario = user;
 
-  // ✅ limpa listener antigo (evita loop)
-  if (unsubscribe) {
-    unsubscribe();
-    unsubscribe = null;
-  }
-
-  if (user) {
+  if(user){
     document.getElementById("login").style.display = "none";
     document.getElementById("app").style.display = "block";
     document.getElementById("user").innerText = "👤 " + user.email;
 
-    // ✅ salva listener (não duplica)
-    unsubscribe = db.collection("despesas")
-      .where("user", "==", user.uid)
-      .onSnapshot(snapshot => {
-
-        let lista = document.getElementById("lista");
-        lista.innerHTML = "";
-        let total = 0;
-
-        snapshot.forEach(doc => {
-          let d = doc.data();
-          total += d.valor;
-
-          lista.innerHTML += `
-            <li>
-              ${d.descricao} - R$ ${d.valor}
-              <button class="remover" onclick="remover('${doc.id}')">❌</button>
-            </li>`;
-        });
-
-        document.getElementById("total").innerText =
-          "💰 Total: R$ " + total.toFixed(2);
-      });
-
+    carregarDados(); // ✅ carrega uma vez
   } else {
     document.getElementById("login").style.display = "flex";
     document.getElementById("app").style.display = "none";
   }
 });
 
-/* ✅ LOGIN COM POPUP (SEM LOOP) */
+/* ✅ LOGIN ESTÁVEL */
 function login(){
   const provider = new firebase.auth.GoogleAuthProvider();
+
   auth.signInWithPopup(provider)
-  .then(result=>{
-    console.log("Login OK:", result.user.email);
-  })
-  .catch(error=>{
-    console.error("Erro login:", error);
-    alert("Erro ao logar: " + error.message);
-  });
+    .then(result => {
+      console.log("Login OK:", result.user.email);
+    })
+    .catch(error => {
+      console.error(error);
+      alert("Erro no login");
+    });
 }
 
 /* LOGOUT */
@@ -202,28 +174,30 @@ function logout(){
   auth.signOut();
 }
 
-/* CARREGAR */
-function carregar(){
+/* ✅ CARREGAR (SEM LOOP) */
+function carregarDados(){
   db.collection("despesas")
-    .where("user","==",usuario.uid)
-    .onSnapshot(snapshot=>{
+    .where("user", "==", usuario.uid)
+    .get()
+    .then(snapshot => {
 
       let lista = document.getElementById("lista");
-      lista.innerHTML="";
-      let total=0;
+      lista.innerHTML = "";
+      let total = 0;
 
-      snapshot.forEach(doc=>{
-        let d=doc.data();
-        total+=d.valor;
+      snapshot.forEach(doc => {
+        let d = doc.data();
+        total += d.valor;
 
-        lista.innerHTML+=`
+        lista.innerHTML += `
         <li>
           ${d.descricao} - R$ ${d.valor}
           <button class="remover" onclick="remover('${doc.id}')">❌</button>
         </li>`;
       });
 
-      document.getElementById("total").innerText="💰 Total: R$ "+total.toFixed(2);
+      document.getElementById("total").innerText =
+        "💰 Total: R$ " + total.toFixed(2);
     });
 }
 
@@ -231,8 +205,8 @@ function carregar(){
 function adicionar(){
   if(!usuario) return alert("Faça login");
 
-  let desc=document.getElementById("desc").value;
-  let val=parseFloat(document.getElementById("val").value);
+  let desc = document.getElementById("desc").value;
+  let val = parseFloat(document.getElementById("val").value);
 
   if(!desc || isNaN(val)) return alert("Preencha");
 
@@ -240,15 +214,14 @@ function adicionar(){
     descricao: desc,
     valor: val,
     user: usuario.uid
-  });
-
-  document.getElementById("desc").value="";
-  document.getElementById("val").value="";
+  })
+  .then(() => carregarDados()); // ✅ recarrega sem loop
 }
 
 /* REMOVER */
 function remover(id){
-  db.collection("despesas").doc(id).delete();
+  db.collection("despesas").doc(id).delete()
+    .then(() => carregarDados()); // ✅ recarrega
 }
 </script>
 
