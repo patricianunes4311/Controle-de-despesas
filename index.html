@@ -1,196 +1,288 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
-    <meta charset="UTF-8">
-    <title>Controle de Despesas</title>
-    <style>
-        body {
-            font-family: Arial;
-            background: linear-gradient(135deg, #fff0f5, #fce4ec);
-            margin: 0;
-            padding: 20px
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle de Despesas</title>
 
+<style>
+body {
+  font-family: Arial;
+  margin:0;
+  display:flex;
+  height:100vh;
+  background: linear-gradient(135deg,#fff0f5,#fce4ec);
+  overflow:hidden;
+}
 
-        .container {
-            max-width: 800px;
-            margin: auto;
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1)
-        }
+/* MENU */
+.menu {
+  width:220px;
+  background:#c2185b;
+  color:#fff;
+  padding:15px;
+  transition:0.3s;
+  height:100vh;
+  overflow-y:auto;
+}
 
+.menu.closed {
+  width:70px;
+}
 
-        h1 {
-            text-align: center;
-            color: #c2185b;
-        }
+.menu button {
+  width:100%;
+  margin-bottom:10px;
+  background:#880e4f;
+  color:white;
+  border:none;
+  padding:8px;
+  cursor:pointer;
+}
 
+.menu ul {
+  list-style:none;
+  padding:0;
+}
 
-        input,
-        button {
-            padding: 12px;
-            margin: 5px 0;
-            width: 100%;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            font-size: 14px;
-        }
+.menu li {
+  margin:10px 0;
+  cursor:pointer;
+  padding:5px;
+  border-radius:5px;
+}
 
+.menu li:hover {
+  background:#880e4f;
+}
 
-        input:focus {
-            outline: none;
-            border-color: #d4af37;
-            box-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
-        }
+/* CONTAINER */
+.container {
+  flex:1;
+  margin:20px;
+  background:#fff;
+  padding:20px;
+  border-radius:12px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.1);
+  overflow:auto;
+}
 
+h1 {
+  text-align:center;
+  color:#c2185b;
+}
 
-        button {
-            background: linear-gradient(45deg, #d4af37, #f7d774);
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-        }
+input, button {
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  border-radius:8px;
+  border:1px solid #ddd;
+}
 
+button {
+  background:linear-gradient(45deg,#d4af37,#ffd700);
+  color:white;
+  border:none;
+}
 
-        button:hover {
-            background: linear-gradient(45deg, #b8962e, #e6c35a);
-            transform: scale(1.02);
-        }
+.fechar {
+  background:#c2185b;
+}
 
+/* TABELA */
+table {
+  width:100%;
+  margin-top:20px;
+  border-collapse: collapse;
+}
 
-        table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-            overflow: hidden;
-            border-radius: 10px;
-        }
+th, td {
+  padding:10px;
+  border-bottom:1px solid #eee;
+}
 
+tr:hover {
+  background:#fff5f8;
+}
 
-        th {
-            background: #f8bbd0;
-            color: #880e4f;
-        }
+.remover-btn {
+  background:#c2185b;
+  color:white;
+  border:none;
+  padding:5px 10px;
+  border-radius:5px;
+  cursor:pointer;
+}
 
+.total {
+  margin-top:15px;
+  font-weight:bold;
+}
 
-        th,
-        td {
-            padding: 10px;
-            border-bottom: 1px solid #f1f1f1;
-            text-align: left
-        }
+/* RESPONSIVO */
+@media (max-width:600px){
+  body {
+    flex-direction:column;
+    overflow:auto;
+  }
 
+  .menu {
+    width:100%;
+    height:auto;
+    display:flex;
+    overflow-x:auto;
+  }
 
-        tr:hover {
-            background: #fff8fb;
-        }
+  .menu ul {
+    display:flex;
+    gap:10px;
+  }
 
+  .menu li {
+    background:#c2185b;
+    padding:8px 12px;
+    white-space:nowrap;
+  }
 
-        .remove {
-            color: #c2185b;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-
-        .remove:hover {
-            color: #880e4f;
-        }
-
-
-        .total {
-            font-weight: bold;
-            margin-top: 15px;
-            font-size: 18px;
-            color: #6a1b9a;
-        }
-    </style>
+  .container {
+    margin:10px;
+  }
+}
+</style>
 </head>
 
 <body>
 
-    <div class="container">
-        <h1>Controle de Despesas</h1>
+<div class="menu" id="menu">
+  <button onclick="toggleMenu()">☰ Menu</button>
+  <ul>
+      <li onclick="trocarMes('2026-12')">Dezembro 2026</li>
+    <li onclick="trocarMes('2026-11')">Novembro 2026</li>
+    <li onclick="trocarMes('2026-10')">Outubro 2026</li>
+    <li onclick="trocarMes('2026-09')">Setembro 2026</li>
+    <li onclick="trocarMes('2026-08')">Agosto 2026</li>
+    <li onclick="trocarMes('2026-06')">Junho 2026</li>
+    <li onclick="trocarMes('2026-05')">Maio 2026</li>
+    <li onclick="trocarMes('2026-04')">Abril 2026</li>
+    <li onclick="trocarMes('2026-03')">Março 2026</li>
+    <li onclick="trocarMes('2026-02')">Fevereiro 2026</li>
+    <li onclick="trocarMes('2026-01')">Janeiro 2026</li>
+  </ul>
+</div>
 
-        <input type="text" id="descricao" placeholder="Descrição">
-        <input type="number" id="valor" placeholder="Valor">
-        <button onclick="adicionarDespesa()">Adicionar</button>
+<div class="container">
+  <h1>Controle de Despesas</h1>
+  <h3 id="mesAtual"></h3>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Descrição</th>
-                    <th>Valor (R$)</th>
-                    <th>Ação</th>
-                </tr>
-            </thead>
-            <tbody id="lista"></tbody>
-        </table>
+  <input type="text" id="descricao" placeholder="Descrição">
+  <input type="number" id="valor" placeholder="Valor">
+  <button onclick="adicionar()">Adicionar</button>
+  <button class="fechar" onclick="fecharMes()">Fechar mês</button>
 
-        <div class="total" id="total">Total: R$ 0,00</div>
-    </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Descrição</th>
+        <th>Valor</th>
+        <th>Ação</th>
+      </tr>
+    </thead>
+    <tbody id="lista"></tbody>
+  </table>
 
-    <script>
-        let despesas = JSON.parse(localStorage.getItem('despesas')) || [];
+  <div class="total" id="total">Total: R$ 0,00</div>
+</div>
 
-        function salvar() {
-            localStorage.setItem('despesas', JSON.stringify(despesas));
-        }
+<script>
+let mesAtual = '2026-05';
 
-        function formatar(valor) {
-            return valor.toFixed(2).replace('.', ',');
-        }
+function toggleMenu(){
+  document.getElementById('menu').classList.toggle('closed');
+}
 
-        function renderizar() {
-            const lista = document.getElementById('lista');
-            lista.innerHTML = '';
-            let total = 0;
+function carregarDados(){
+  return JSON.parse(localStorage.getItem(mesAtual)) || [];
+}
 
-            despesas.forEach((item, index) => {
-                total += item.valor;
+function salvarDados(dados){
+  localStorage.setItem(mesAtual, JSON.stringify(dados));
+}
 
-                const linha = document.createElement('tr');
-                linha.innerHTML = `
-        <td>${item.descricao}</td>
-        <td>R$ ${formatar(item.valor)}</td>
-        <td><span class="remove" onclick="remover(${index})">Remover</span></td>
-      `;
+function formatar(v){
+  return v.toFixed(2).replace('.',',');
+}
 
-                lista.appendChild(linha);
-            });
+function render(){
+  const lista = document.getElementById('lista');
+  lista.innerHTML = '';
+  let total=0;
 
-            document.getElementById('total').innerText = `Total: R$ ${formatar(total)}`;
-        }
+  document.getElementById('mesAtual').innerText = 'Mês atual: ' + mesAtual;
 
-        function adicionarDespesa() {
-            const descricao = document.getElementById('descricao').value;
-            const valor = parseFloat(document.getElementById('valor').value);
+  const despesas = carregarDados();
 
-            if (!descricao || isNaN(valor)) {
-                alert('Preencha todos os campos corretamente!');
-                return;
-            }
+  despesas.forEach((d,i)=>{
+    total+=d.valor;
 
-            despesas.push({ descricao, valor });
-            salvar();
-            renderizar();
+    lista.innerHTML+=`<tr>
+      <td>${d.descricao}</td>
+      <td>R$ ${formatar(d.valor)}</td>
+      <td><button class="remover-btn" onclick="remover(${i})">Remover</button></td>
+    </tr>`;
+  });
 
-            document.getElementById('descricao').value = '';
-            document.getElementById('valor').value = '';
-        }
+  document.getElementById('total').innerText=`Total: R$ ${formatar(total)}`;
+}
 
-        function remover(index) {
-            despesas.splice(index, 1);
-            salvar();
-            renderizar();
-        }
+function adicionar(){
+  if(localStorage.getItem(mesAtual + '_fechado')){
+    alert('Esse mês está fechado!');
+    return;
+  }
 
-        renderizar();
-    </script>
+  let despesas = carregarDados();
+
+  const desc=document.getElementById('descricao').value;
+  const val=parseFloat(document.getElementById('valor').value);
+
+  if(!desc || isNaN(val)){
+    alert('Preencha corretamente');
+    return;
+  }
+
+  despesas.push({descricao:desc,valor:val});
+  salvarDados(despesas);
+  render();
+
+  document.getElementById('descricao').value='';
+  document.getElementById('valor').value='';
+}
+
+function remover(i){
+  if(localStorage.getItem(mesAtual + '_fechado')){
+    alert('Esse mês está fechado!');
+    return;
+  }
+
+  let despesas = carregarDados();
+  despesas.splice(i,1);
+  salvarDados(despesas);
+  render();
+}
+
+function fecharMes(){
+  localStorage.setItem(mesAtual + '_fechado', true);
+  alert('Mês fechado!');
+}
+
+function trocarMes(mes){
+  mesAtual = mes;
+  render();
+}
+
+render();
+</script>
 
 </body>
+</html>
