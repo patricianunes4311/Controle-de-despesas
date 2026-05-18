@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Controle de Despesas</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(135deg, #fff0f5, #fce4ec);
+            margin: 0;
+            padding: 20px
+        }
+
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1)
+        }
+
+
+        h1 {
+            text-align: center;
+            color: #c2185b;
+        }
+
+
+        input,
+        button {
+            padding: 12px;
+            margin: 5px 0;
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+
+        input:focus {
+            outline: none;
+            border-color: #d4af37;
+            box-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
+        }
+
+
+        button {
+            background: linear-gradient(45deg, #d4af37, #f7d774);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+
+        button:hover {
+            background: linear-gradient(45deg, #b8962e, #e6c35a);
+            transform: scale(1.02);
+        }
+
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+
+
+        th {
+            background: #f8bbd0;
+            color: #880e4f;
+        }
+
+
+        th,
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #f1f1f1;
+            text-align: left
+        }
+
+
+        tr:hover {
+            background: #fff8fb;
+        }
+
+
+        .remove {
+            color: #c2185b;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+
+        .remove:hover {
+            color: #880e4f;
+        }
+
+
+        .total {
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 18px;
+            color: #6a1b9a;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Controle de Despesas</h1>
+
+        <input type="text" id="descricao" placeholder="Descrição">
+        <input type="number" id="valor" placeholder="Valor">
+        <button onclick="adicionarDespesa()">Adicionar</button>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Descrição</th>
+                    <th>Valor (R$)</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody id="lista"></tbody>
+        </table>
+
+        <div class="total" id="total">Total: R$ 0,00</div>
+    </div>
+
+    <script>
+        let despesas = JSON.parse(localStorage.getItem('despesas')) || [];
+
+        function salvar() {
+            localStorage.setItem('despesas', JSON.stringify(despesas));
+        }
+
+        function formatar(valor) {
+            return valor.toFixed(2).replace('.', ',');
+        }
+
+        function renderizar() {
+            const lista = document.getElementById('lista');
+            lista.innerHTML = '';
+            let total = 0;
+
+            despesas.forEach((item, index) => {
+                total += item.valor;
+
+                const linha = document.createElement('tr');
+                linha.innerHTML = `
+        <td>${item.descricao}</td>
+        <td>R$ ${formatar(item.valor)}</td>
+        <td><span class="remove" onclick="remover(${index})">Remover</span></td>
+      `;
+
+                lista.appendChild(linha);
+            });
+
+            document.getElementById('total').innerText = `Total: R$ ${formatar(total)}`;
+        }
+
+        function adicionarDespesa() {
+            const descricao = document.getElementById('descricao').value;
+            const valor = parseFloat(document.getElementById('valor').value);
+
+            if (!descricao || isNaN(valor)) {
+                alert('Preencha todos os campos corretamente!');
+                return;
+            }
+
+            despesas.push({ descricao, valor });
+            salvar();
+            renderizar();
+
+            document.getElementById('descricao').value = '';
+            document.getElementById('valor').value = '';
+        }
+
+        function remover(index) {
+            despesas.splice(index, 1);
+            salvar();
+            renderizar();
+        }
+
+        renderizar();
+    </script>
+
+</body>
