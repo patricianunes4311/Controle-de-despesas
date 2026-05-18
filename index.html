@@ -1,32 +1,31 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Controle de Despesas</title>
 
-<!-- ✅ Firebase -->
+<!-- ✅ FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <style>
-body {
+body{
   font-family: Arial;
-  margin: 0;
-  background: linear-gradient(135deg,#fff0f5,#fce4ec);
+  margin:0;
+  background:linear-gradient(135deg,#fff0f5,#fce4ec);
 }
 
 /* LOGIN */
-.login {
+.login{
   height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
 }
 
-.box {
+.box{
   background:#fff;
   padding:30px;
   border-radius:15px;
@@ -35,21 +34,22 @@ body {
   box-shadow:0 10px 25px rgba(0,0,0,0.1);
 }
 
-.box h2 { color:#c2185b; }
+.box h2{
+  color:#c2185b;
+}
 
-.login-btn {
+.login-btn{
   background:linear-gradient(45deg,#d4af37,#ffd700);
   border:none;
   padding:12px;
   border-radius:10px;
   width:100%;
-  font-weight:bold;
-  margin-top:15px;
   cursor:pointer;
+  font-weight:bold;
 }
 
 /* APP */
-.app {
+.app{
   display:none;
   max-width:500px;
   margin:30px auto;
@@ -59,9 +59,11 @@ body {
   box-shadow:0 10px 25px rgba(0,0,0,0.1);
 }
 
-h1 { color:#c2185b; }
+h1{
+  color:#c2185b;
+}
 
-input, button {
+input,button{
   width:100%;
   padding:10px;
   margin-top:10px;
@@ -69,17 +71,25 @@ input, button {
   border:1px solid #ddd;
 }
 
-.add { background:linear-gradient(45deg,#d4af37,#ffd700); }
-.logout { background:#c2185b;color:white;border:none; }
+.add{
+  background:linear-gradient(45deg,#d4af37,#ffd700);
+  border:none;
+}
 
-.remover {
+.logout{
+  background:#c2185b;
+  color:white;
+  border:none;
+}
+
+.remover{
   background:#c2185b;
   color:white;
   border:none;
   margin-left:10px;
 }
 
-.total {
+.total{
   margin-top:15px;
   font-weight:bold;
 }
@@ -99,7 +109,7 @@ input, button {
 
 <!-- APP -->
 <div class="app" id="app">
-  <h1>💸 Despesas</h1>
+  <h1>💸 Minhas Despesas</h1>
   <p id="user"></p>
 
   <input id="desc" placeholder="Descrição">
@@ -109,7 +119,7 @@ input, button {
   <button class="logout" onclick="logout()">🚪 Sair</button>
 
   <ul id="lista"></ul>
-  <div class="total" id="total"></div>
+  <div id="total" class="total"></div>
 </div>
 
 <script>
@@ -128,37 +138,38 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 let usuario = null;
+let carregado = false;
 
-/* ✅ CORREÇÃO DO LOOP */
-auth.getRedirectResult()
-  .then((result) => {
-    if (result.user) {
-      console.log("Login OK:", result.user.email);
-    }
-  })
-  .catch((error) => {
-    console.error("Erro login:", error);
-  });
+/* ✅ CONTROLE DE LOGIN (SEM LOOP) */
+auth.onAuthStateChanged(user=>{
+  if(carregado && usuario) return;
 
-/* ✅ ESTADO LOGIN */
-auth.onAuthStateChanged(user => {
   usuario = user;
+  carregado = true;
 
   if(user){
     document.getElementById("login").style.display="none";
     document.getElementById("app").style.display="block";
-    document.getElementById("user").innerText = "👤 " + user.email;
+    document.getElementById("user").innerText="👤 "+user.email;
+
     carregar();
-  } else {
+  }else{
     document.getElementById("login").style.display="flex";
     document.getElementById("app").style.display="none";
   }
 });
 
-/* ✅ LOGIN */
+/* ✅ LOGIN COM POPUP (SEM LOOP) */
 function login(){
   const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithRedirect(provider);
+  auth.signInWithPopup(provider)
+  .then(result=>{
+    console.log("Login OK:", result.user.email);
+  })
+  .catch(error=>{
+    console.error("Erro login:", error);
+    alert("Erro ao logar: " + error.message);
+  });
 }
 
 /* LOGOUT */
@@ -170,24 +181,24 @@ function logout(){
 function carregar(){
   db.collection("despesas")
     .where("user","==",usuario.uid)
-    .onSnapshot(snapshot => {
+    .onSnapshot(snapshot=>{
 
       let lista = document.getElementById("lista");
       lista.innerHTML="";
       let total=0;
 
       snapshot.forEach(doc=>{
-        let d = doc.data();
-        total += d.valor;
+        let d=doc.data();
+        total+=d.valor;
 
-        lista.innerHTML += `
+        lista.innerHTML+=`
         <li>
           ${d.descricao} - R$ ${d.valor}
           <button class="remover" onclick="remover('${doc.id}')">❌</button>
         </li>`;
       });
 
-      document.getElementById("total").innerText = "💰 Total: R$ " + total.toFixed(2);
+      document.getElementById("total").innerText="💰 Total: R$ "+total.toFixed(2);
     });
 }
 
@@ -195,8 +206,8 @@ function carregar(){
 function adicionar(){
   if(!usuario) return alert("Faça login");
 
-  let desc = document.getElementById("desc").value;
-  let val = parseFloat(document.getElementById("val").value);
+  let desc=document.getElementById("desc").value;
+  let val=parseFloat(document.getElementById("val").value);
 
   if(!desc || isNaN(val)) return alert("Preencha");
 
