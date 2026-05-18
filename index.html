@@ -1,332 +1,159 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Controle de Despesas</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Despesas</title>
 
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyDzPAdEz9KZcosVz76EAjoqLPZ_CLlLDbs",
-    authDomain: "controle-de-despesas-d337d.firebaseapp.com",
-    projectId: "controle-de-despesas-d337d",
-    storageBucket: "controle-de-despesas-d337d.firebasestorage.app",
-    messagingSenderId: "193503396678",
-    appId: "1:193503396678:web:1d6da798b3c07284dcdb47",
-    measurementId: "G-KHV3XKFDMR"
-  };
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyDzPAdEz9KZcosVz76EAjoqLPZ_CLlLDbs",
+            authDomain: "controle-de-despesas-d337d.firebaseapp.com",
+            projectId: "controle-de-despesas-d337d",
+            storageBucket: "controle-de-despesas-d337d.firebasestorage.app",
+            messagingSenderId: "193503396678",
+            appId: "1:193503396678:web:1d6da798b3c07284dcdb47",
+            measurementId: "G-KHV3XKFDMR"
+        };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+    </script>
 
 
 
-<style>
-body {
-  font-family: Arial;
-  margin:0;
-  display:flex;
-  height:100vh;
-  background: linear-gradient(135deg,#fff0f5,#fce4ec);
-  overflow:hidden;
-  transition:0.3s;
-}
 
-/* MENU */
-.menu {
-  width:220px;
-  background:linear-gradient(180deg,#fd7baf,#880e4f);
-  color:#fff;
-  padding:15px;
-  transition:0.3s;
-  height:100vh;
-  overflow-y:auto;
-}
 
-.menu.closed { width:70px; }
+    <style>
+        body {
+            font-family: Arial;
+            margin: 0;
+            background: linear-gradient(135deg, #fff0f5, #fce4ec);
+        }
 
-.menu button {
-  width:100%;
-  margin-bottom:10px;
-  background:#fff2;
-  color:white;
-  border:none;
-  padding:10px;
-  cursor:pointer;
-  border-radius:10px;
-}
+        .container {
+            max-width: 500px;
+            margin: 30px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+        }
 
-.menu ul { list-style:none; padding:0; }
+        button,
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 8px;
+        }
 
-.menu li {
-  margin:10px 0;
-  cursor:pointer;
-  padding:8px;
-  border-radius:8px;
-  transition:0.3s;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-
-.menu li:hover {
-  background:#ffffff33;
-  transform:translateX(4px);
-}
-
-/* CONTAINER */
-.container {
-  flex:1;
-  margin:20px;
-  background:#fff;
-  padding:20px;
-  border-radius:12px;
-  box-shadow:0 8px 20px rgba(0,0,0,0.1);
-  overflow:auto;
-  animation:fade 0.5s;
-}
-
-@keyframes fade {
-  from {opacity:0; transform:translateY(10px);} 
-  to {opacity:1;}
-}
-
-h1 {
-  text-align:center;
-  color:#c2185b;
-}
-
-input, button {
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border-radius:10px;
-  border:1px solid #ddd;
-  font-size:14px;
-}
-
-button {
-  background:linear-gradient(45deg,#d4af37,#ffd700);
-  color:white;
-  border:none;
-  font-weight:bold;
-  transition:0.3s;
-}
-
-button:hover { transform:scale(1.03); }
-
-.fechar { background:#c2185b; }
-
-/* TABELA */
-table {
-  width:100%;
-  margin-top:20px;
-  border-collapse: collapse;
-}
-
-th, td {
-  padding:10px;
-  border-bottom:1px solid #eee;
-}
-
-tr:hover {
-  background:#fff5f8;
-  transition:0.3s;
-}
-
-.remover-btn {
-  background:#c2185b;
-  color:white;
-  border:none;
-  padding:6px 12px;
-  border-radius:8px;
-  cursor:pointer;
-  transition:0.2s;
-}
-
-.remover-btn:hover {
-  background:#880e4f;
-  transform:scale(1.05);
-}
-
-.total {
-  margin-top:15px;
-  font-weight:bold;
-  font-size:18px;
-}
-
-/* MOBILE */
-@media (max-width:600px){
-  body {
-    flex-direction:column;
-    height:auto;
-    overflow:auto;
-  }
-
-  .menu {
-    width:100%;
-    height:auto;
-    position:sticky;
-    top:0;
-    z-index:10;
-  }
-
-  .menu ul {
-    display:flex;
-    overflow-x:auto;
-    gap:8px;
-    padding-top:10px;
-  }
-
-  .menu li {
-    flex:none;
-    background:#ffffff22;
-  }
-
-  .container {
-    margin:10px;
-  }
-}
-</style>
+        button {
+            background: #c2185b;
+            color: white;
+            border: none;
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="menu" id="menu">
-  <button onclick="toggleMenu()">☰ Menu</button>
-  <ul>
-    <li onclick="trocarMes('2026-12')">📅 Dezembro</li>
-    <li onclick="trocarMes('2026-11')">📅 Novembro</li>
-    <li onclick="trocarMes('2026-10')">📅 Outubro</li>
-    <li onclick="trocarMes('2026-09')">📅 Setembro</li>
-    <li onclick="trocarMes('2026-08')">📅 Agosto</li>
-    <li onclick="trocarMes('2026-07')">📅 Julho</li>
-    <li onclick="trocarMes('2026-06')">📅 Junho</li>
-    <li onclick="trocarMes('2026-05')">📅 Maio</li>
-    <li onclick="trocarMes('2026-04')">📅 Abril</li>
-    <li onclick="trocarMes('2026-03')">📅 Março</li>
-    <li onclick="trocarMes('2026-02')">📅 Fevereiro</li>
-    <li onclick="trocarMes('2026-01')">📅 Janeiro</li>
+    <div class="container">
+        <h2>💸 Controle com Login</h2>
 
-  </ul>
-</div>
+        <button onclick="login()">🔐 Entrar com Google</button>
+        <button onclick="logout()">🚪 Sair</button>
 
-<div class="container">
-  <h1>💸 Controle de Despesas</h1>
-  <h3 id="mesAtual"></h3>
+        <p id="user"></p>
 
-  <input type="text" id="descricao" placeholder="📝 Descrição">
-  <input type="number" id="valor" placeholder="💰 Valor">
-  
-  <button onclick="adicionar()">➕ Adicionar</button>
-  <button class="fechar" onclick="fecharMes()">🔒 Fechar mês</button>
+        <input type="text" id="desc" placeholder="Descrição">
+        <input type="number" id="val" placeholder="Valor">
+        <button onclick="adicionar()">➕ Adicionar</button>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Descrição</th>
-        <th>Valor</th>
-        <th>Ação</th>
-      </tr>
-    </thead>
-    <tbody id="lista"></tbody>
-  </table>
+        <ul id="lista"></ul>
+        <h3 id="total"></h3>
+    </div>
 
-  <div class="total" id="total">Total: R$ 0,00</div>
-</div>
+    <script>
+        const firebaseConfig = {
+            apiKey: "COLE_AQUI",
+            authDomain: "controle-de-despesas-d337d.firebaseapp.com",
+            projectId: "controle-de-despesas-d337d",
+            storageBucket: "controle-de-despesas-d337d.appspot.com",
+            messagingSenderId: "COLE_AQUI",
+            appId: "COLE_AQUI"
+        };
 
-<script>
-let mesAtual = '2026-05';
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
 
-function toggleMenu(){
-  document.getElementById('menu').classList.toggle('closed');
-}
+        let usuario = null;
 
-function carregarDados(){
-  return JSON.parse(localStorage.getItem(mesAtual)) || [];
-}
+        auth.onAuthStateChanged(u => {
+            usuario = u;
+            if (u) {
+                document.getElementById('user').innerText = "Usuário: " + u.email;
+                carregar();
+            }
+        });
 
-function salvarDados(dados){
-  localStorage.setItem(mesAtual, JSON.stringify(dados));
-}
+        function login() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider);
+        }
 
-function formatar(v){ return v.toFixed(2).replace('.',','); }
+        function logout() { auth.signOut(); }
 
-function render(){
-  const lista = document.getElementById('lista');
-  lista.innerHTML = '';
-  let total=0;
+        function carregar() {
+            db.collection("despesas").where("user", "==", usuario.uid)
+                .onSnapshot(snapshot => {
+                    const lista = document.getElementById('lista');
+                    lista.innerHTML = '';
+                    let total = 0;
 
-  document.getElementById('mesAtual').innerText = '📆 Mês atual: ' + mesAtual;
+                    snapshot.forEach(doc => {
+                        const d = doc.data();
+                        total += d.valor;
+                        lista.innerHTML += `
+      <li>${d.descricao} - R$ ${d.valor}
+      <button onclick="remover('${doc.id}')">❌</button></li>`;
+                    });
 
-  const despesas = carregarDados();
+                    document.getElementById('total').innerText = "Total: R$ " + total.toFixed(2);
+                });
+        }
 
-  despesas.forEach((d,i)=>{
-    total+=d.valor;
-    lista.innerHTML+=`<tr>
-      <td>${d.descricao}</td>
-      <td>R$ ${formatar(d.valor)}</td>
-      <td><button class="remover-btn" onclick="remover(${i})">❌ Remover</button></td>
-    </tr>`;
-  });
+        function adicionar() {
+            if (!usuario) return alert('Faça login');
 
-  document.getElementById('total').innerText=`💰 Total: R$ ${formatar(total)}`;
-}
+            const desc = document.getElementById('desc').value;
+            const val = parseFloat(document.getElementById('val').value);
 
-function adicionar(){
-  if(localStorage.getItem(mesAtual + '_fechado')){
-    alert('Esse mês está fechado!');
-    return;
-  }
+            if (!desc || isNaN(val)) return alert('Preencha');
 
-  let despesas = carregarDados();
-  const desc=document.getElementById('descricao').value;
-  const val=parseFloat(document.getElementById('valor').value);
+            db.collection("despesas").add({
+                descricao: desc,
+                valor: val,
+                user: usuario.uid
+            });
 
-  if(!desc || isNaN(val)){
-    alert('Preencha corretamente');
-    return;
-  }
+            document.getElementById('desc').value = '';
+            document.getElementById('val').value = '';
+        }
 
-  despesas.push({descricao:desc,valor:val});
-  salvarDados(despesas);
-  render();
-
-  document.getElementById('descricao').value='';
-  document.getElementById('valor').value='';
-}
-
-function remover(i){
-  if(localStorage.getItem(mesAtual + '_fechado')){
-    alert('Esse mês está fechado!');
-    return;
-  }
-
-  let despesas = carregarDados();
-  despesas.splice(i,1);
-  salvarDados(despesas);
-  render();
-}
-
-function fecharMes(){
-  localStorage.setItem(mesAtual + '_fechado', true);
-  alert('Mês fechado!');
-}
-
-function trocarMes(mes){ mesAtual = mes; render(); }
-
-render();
-</script>
+        function remover(id) { db.collection("despesas").doc(id).delete(); }
+    </script>
 
 </body>
+
 </html>
