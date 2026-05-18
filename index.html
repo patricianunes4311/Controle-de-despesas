@@ -122,31 +122,44 @@ tr:hover {
 
 /* RESPONSIVO */
 @media (max-width:600px){
+
   body {
-    flex-direction:column;
-    overflow:auto;
+    flex-direction: column;
+    height: auto;
+    overflow: auto;
   }
 
   .menu {
-    width:100%;
-    height:auto;
-    display:flex;
-    overflow-x:auto;
+    width: 100%;
+    height: auto;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: block;
+  }
+
+  .menu button {
+    border-radius: 10px;
   }
 
   .menu ul {
-    display:flex;
-    gap:10px;
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+    padding-top: 10px;
   }
 
   .menu li {
-    background:#c2185b;
-    padding:8px 12px;
-    white-space:nowrap;
+    flex: none;
+    background: #880e4f;
+    padding: 8px 12px;
+    border-radius: 8px;
+    white-space: nowrap;
+    font-size: 14px;
   }
 
   .container {
-    margin:10px;
+    margin: 10px;
   }
 }
 </style>
