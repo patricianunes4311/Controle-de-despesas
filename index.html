@@ -4,104 +4,126 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Controle de Despesas</title>
+<title>Controle Financeiro</title>
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <style>
 body{
-  margin:0;
   font-family:Arial;
+  margin:0;
+  background:linear-gradient(135deg,#fff0f5,#fce4ec);
+}
+
+/* LOGIN */
+.login{
+  height:100vh;
   display:flex;
-  background:#fce4ec;
-}
-
-/* MENU */
-.menu{
-  width:220px;
-  background:#c2185b;
-  color:white;
-  padding:20px;
-}
-
-.menu h3{
-  margin-top:0;
-}
-
-.menu button{
-  display:block;
-  width:100%;
-  margin-top:8px;
-  padding:8px;
-  border:none;
-  background:#880e4f;
-  color:white;
-  cursor:pointer;
-  border-radius:5px;
-}
-
-.menu button.ativo{
-  background:gold;
-  color:black;
-  font-weight:bold;
-}
-
-/* CONTEÚDO */
-.main{
-  flex:1;
-  padding:20px;
+  justify-content:center;
+  align-items:center;
 }
 
 .box{
-  background:white;
-  padding:20px;
-  border-radius:10px;
+  background:#fff;
+  padding:30px;
+  border-radius:15px;
+  text-align:center;
 }
 
-/* BOTÕES */
-.add{
-  background:gold;
-}
-
-.remover{
-  background:red;
-  color:white;
+.login-btn{
+  background:linear-gradient(45deg,#d4af37,#ffd700);
   border:none;
-  margin-left:10px;
-}
-
-.bloqueado{
-  background:gray;
-  cursor:not-allowed;
-}
-
-input,button{
+  padding:12px;
+  border-radius:10px;
   width:100%;
-  margin-top:10px;
-  padding:8px;
+}
+
+/* APP */
+.app{
+  display:none;
+  max-width:500px;
+  margin:30px auto;
+  background:#fff;
+  padding:20px;
+  border-radius:15px;
 }
 
 .topo{
   display:flex;
   justify-content:space-between;
+  align-items:center;
+}
+
+select{
+  padding:8px;
+  border-radius:8px;
+}
+
+.btn-fechar{
+  background:#c2185b;
+  color:white;
+  border:none;
+  padding:8px;
+  border-radius:8px;
+}
+
+input, button{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  border-radius:10px;
+}
+
+.add{
+  background:linear-gradient(45deg,#d4af37,#ffd700);
+}
+
+.remover{
+  background:red;
+  color:white;
+  margin-left:10px;
+}
+
+.total{
+  margin-top:10px;
+  font-weight:bold;
 }
 </style>
 </head>
 
 <body>
 
-<div class="menu" id="menu">
-  <h3>📅 Meses</h3>
+<!-- LOGIN -->
+<div class="login" id="login">
+  <div class="box">
+    <h2>💎 Controle Financeiro</h2>
+    <button class="login-btn" onclick="login()">🔐 Entrar com Google</button>
+  </div>
 </div>
 
-<div class="main">
-<div class="box">
+<!-- APP -->
+<div class="app" id="app">
 
 <div class="topo">
-  <h2 id="tituloMes">Mês</h2>
-  <button onclick="fecharMes()">🔒 Fechar mês</button>
+  <select id="mes" onchange="trocarMes()">
+    <option value="01">Janeiro</option>
+    <option value="02">Fevereiro</option>
+    <option value="03">Março</option>
+    <option value="04">Abril</option>
+    <option value="05">Maio</option>
+    <option value="06">Junho</option>
+    <option value="07">Julho</option>
+    <option value="08">Agosto</option>
+    <option value="09">Setembro</option>
+    <option value="10">Outubro</option>
+    <option value="11">Novembro</option>
+    <option value="12">Dezembro</option>
+  </select>
+
+  <button class="btn-fechar" onclick="fecharMes()">🔒</button>
 </div>
 
 <p id="user"></p>
@@ -112,9 +134,8 @@ input,button{
 <button class="add" onclick="adicionar()">➕ Adicionar</button>
 
 <ul id="lista"></ul>
-<h3 id="total"></h3>
+<div class="total" id="total"></div>
 
-</div>
 </div>
 
 <script>
@@ -133,68 +154,15 @@ let usuario = null;
 let mesAtual = "01";
 let fechado = false;
 
-const meses = [
-  "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
-  "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
-];
-
-/* MENU */
-function criarMenu(){
-  let menu = document.getElementById("menu");
-
-  meses.forEach((nome,i)=>{
-    let btn=document.createElement("button");
-    let num=(i+1).toString().padStart(2,"0");
-
-    btn.textContent=nome;
-    btn.onclick=()=>trocarMes(num,nome);
-
-    menu.appendChild(btn);
-  });
-}
-
-/* TROCAR MÊS */
-function trocarMes(num,nome){
-  mesAtual = num;
-  document.getElementById("tituloMes").innerText=nome;
-
-  document.querySelectorAll(".menu button").forEach(b=>b.classList.remove("ativo"));
-  event.target.classList.add("ativo");
-
-  verificarMes();
-}
-
-/* VERIFICA SE ESTÁ FECHADO */
-function verificarMes(){
-
-  db.collection("meses")
-  .doc(usuario.uid+"_"+mesAtual)
-  .get()
-  .then(doc=>{
-    fechado = doc.exists;
-    carregar();
-  });
-}
-
-/* FECHAR MÊS */
-function fecharMes(){
-
-  db.collection("meses")
-  .doc(usuario.uid+"_"+mesAtual)
-  .set({fechado:true})
-  .then(()=>{
-    fechado=true;
-    alert("Mês fechado!");
-  });
-}
-
 /* LOGIN */
 auth.onAuthStateChanged(user=>{
   if(user){
     usuario=user;
+    document.getElementById("login").style.display="none";
+    document.getElementById("app").style.display="block";
     document.getElementById("user").innerText=user.email;
-    criarMenu();
-    trocarMes("01","Janeiro");
+
+    carregar();
   }else{
     login();
   }
@@ -205,6 +173,34 @@ function login(){
   auth.signInWithPopup(provider);
 }
 
+/* TROCAR MÊS */
+function trocarMes(){
+  mesAtual=document.getElementById("mes").value;
+  verificarMes();
+}
+
+/* VERIFICAR SE FECHADO */
+function verificarMes(){
+  db.collection("meses")
+  .doc(usuario.uid+"_"+mesAtual)
+  .get()
+  .then(doc=>{
+    fechado=doc.exists;
+    carregar();
+  });
+}
+
+/* FECHAR MÊS */
+function fecharMes(){
+  db.collection("meses")
+  .doc(usuario.uid+"_"+mesAtual)
+  .set({fechado:true});
+
+  fechado=true;
+  alert("Mês fechado!");
+  carregar();
+}
+
 /* CARREGAR */
 function carregar(){
   db.collection("despesas")
@@ -213,22 +209,22 @@ function carregar(){
   .get()
   .then(snapshot=>{
 
-    let lista=document.getElementById("lista");
-    lista.innerHTML="";
+    let lista="";
     let total=0;
 
     snapshot.forEach(doc=>{
       let d=doc.data();
       total+=d.valor;
 
-      lista.innerHTML+=`
+      lista+=`
       <li>
         ${d.descricao} - R$ ${d.valor}
         ${fechado ? "" : `<button class="remover" onclick="remover('${doc.id}')">❌</button>`}
       </li>`;
     });
 
-    document.getElementById("total").innerText="Total: R$ "+total.toFixed(2);
+    document.getElementById("lista").innerHTML=lista;
+    document.getElementById("total").innerText="💰 R$ "+total.toFixed(2);
   });
 }
 
@@ -240,7 +236,7 @@ function adicionar(){
   let desc=document.getElementById("desc").value;
   let val=parseFloat(document.getElementById("val").value);
 
-  if(!desc||isNaN(val)) return alert('Preencha');
+  if(!desc||isNaN(val)) return alert("Preencha");
 
   db.collection("despesas").add({
     descricao:desc,
