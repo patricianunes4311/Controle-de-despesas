@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Controle de Despesas</title>
 
-<!-- ✅ SCRIPTS FIREBASE CORRETOS -->
+<!-- ✅ Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -35,9 +35,7 @@ body {
   box-shadow:0 10px 25px rgba(0,0,0,0.1);
 }
 
-.box h2 {
-  color:#c2185b;
-}
+.box h2 { color:#c2185b; }
 
 .login-btn {
   background:linear-gradient(45deg,#d4af37,#ffd700);
@@ -61,9 +59,7 @@ body {
   box-shadow:0 10px 25px rgba(0,0,0,0.1);
 }
 
-h1 {
-  color:#c2185b;
-}
+h1 { color:#c2185b; }
 
 input, button {
   width:100%;
@@ -73,22 +69,14 @@ input, button {
   border:1px solid #ddd;
 }
 
-.add {
-  background:linear-gradient(45deg,#d4af37,#ffd700);
-  border:none;
-}
-
-.logout {
-  background:#c2185b;
-  color:white;
-  border:none;
-}
+.add { background:linear-gradient(45deg,#d4af37,#ffd700); }
+.logout { background:#c2185b;color:white;border:none; }
 
 .remover {
   background:#c2185b;
   color:white;
-  margin-left:10px;
   border:none;
+  margin-left:10px;
 }
 
 .total {
@@ -136,10 +124,21 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
-const db = firebase.firestore();
 const auth = firebase.auth();
+const db = firebase.firestore();
 
 let usuario = null;
+
+/* ✅ CORREÇÃO DO LOOP */
+auth.getRedirectResult()
+  .then((result) => {
+    if (result.user) {
+      console.log("Login OK:", result.user.email);
+    }
+  })
+  .catch((error) => {
+    console.error("Erro login:", error);
+  });
 
 /* ✅ ESTADO LOGIN */
 auth.onAuthStateChanged(user => {
@@ -148,7 +147,7 @@ auth.onAuthStateChanged(user => {
   if(user){
     document.getElementById("login").style.display="none";
     document.getElementById("app").style.display="block";
-    document.getElementById("user").innerText="👤 "+user.email;
+    document.getElementById("user").innerText = "👤 " + user.email;
     carregar();
   } else {
     document.getElementById("login").style.display="flex";
@@ -173,23 +172,23 @@ function carregar(){
     .where("user","==",usuario.uid)
     .onSnapshot(snapshot => {
 
-    let lista = document.getElementById("lista");
-    lista.innerHTML = "";
-    let total = 0;
+      let lista = document.getElementById("lista");
+      lista.innerHTML="";
+      let total=0;
 
-    snapshot.forEach(doc => {
-      let d = doc.data();
-      total += d.valor;
+      snapshot.forEach(doc=>{
+        let d = doc.data();
+        total += d.valor;
 
-      lista.innerHTML += `
+        lista.innerHTML += `
         <li>
           ${d.descricao} - R$ ${d.valor}
           <button class="remover" onclick="remover('${doc.id}')">❌</button>
         </li>`;
-    });
+      });
 
-    document.getElementById("total").innerText = "💰 Total: R$ " + total.toFixed(2);
-  });
+      document.getElementById("total").innerText = "💰 Total: R$ " + total.toFixed(2);
+    });
 }
 
 /* ADICIONAR */
@@ -207,8 +206,8 @@ function adicionar(){
     user: usuario.uid
   });
 
-  document.getElementById("desc").value = "";
-  document.getElementById("val").value = "";
+  document.getElementById("desc").value="";
+  document.getElementById("val").value="";
 }
 
 /* REMOVER */
