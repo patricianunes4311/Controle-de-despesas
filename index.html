@@ -138,24 +138,49 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 let usuario = null;
-let carregado = false;
+let unsubscribe = null; // ✅ controlar listener
 
-/* ✅ CONTROLE DE LOGIN (SEM LOOP) */
-auth.onAuthStateChanged(user=>{
-  if(carregado && usuario) return;
-
+auth.onAuthStateChanged(user => {
   usuario = user;
-  carregado = true;
 
-  if(user){
-    document.getElementById("login").style.display="none";
-    document.getElementById("app").style.display="block";
-    document.getElementById("user").innerText="👤 "+user.email;
+  // ✅ limpa listener antigo (evita loop)
+  if (unsubscribe) {
+    unsubscribe();
+    unsubscribe = null;
+  }
 
-    carregar();
-  }else{
-    document.getElementById("login").style.display="flex";
-    document.getElementById("app").style.display="none";
+  if (user) {
+    document.getElementById("login").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    document.getElementById("user").innerText = "👤 " + user.email;
+
+    // ✅ salva listener (não duplica)
+    unsubscribe = db.collection("despesas")
+      .where("user", "==", user.uid)
+      .onSnapshot(snapshot => {
+
+        let lista = document.getElementById("lista");
+        lista.innerHTML = "";
+        let total = 0;
+
+        snapshot.forEach(doc => {
+          let d = doc.data();
+          total += d.valor;
+
+          lista.innerHTML += `
+            <li>
+              ${d.descricao} - R$ ${d.valor}
+              <button class="remover" onclick="remover('${doc.id}')">❌</button>
+            </li>`;
+        });
+
+        document.getElementById("total").innerText =
+          "💰 Total: R$ " + total.toFixed(2);
+      });
+
+  } else {
+    document.getElementById("login").style.display = "flex";
+    document.getElementById("app").style.display = "none";
   }
 });
 
