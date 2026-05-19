@@ -557,10 +557,11 @@ function verificarFechamento() {
     .doc(usuario.uid + "_" + mesAtual)
     .get()
     .then(doc => {
-      fechado = doc.exists;
+      fechado = doc.exists && doc.data().fechado === true;
       atualizarBadge();
       carregar();
-    });
+    })
+    .catch(err => console.error("Erro ao verificar fechamento:", err));
 }
 
 function atualizarBadge() {
@@ -573,12 +574,16 @@ function atualizarBadge() {
 function fecharMes() {
   if (fechado) return alert("Este mês já está fechado.");
   if (!confirm("Fechar o mês? Não será possível adicionar ou remover despesas.")) return;
+
   db.collection("meses")
     .doc(usuario.uid + "_" + mesAtual)
-    .set({ fechado: true });
-  fechado = true;
-  atualizarBadge();
-  carregar();
+    .set({ fechado: true })
+    .then(() => {
+      fechado = true;
+      atualizarBadge();
+      carregar();
+    })
+    .catch(err => alert("Erro ao fechar mês: " + err.message));
 }
 
 /* ── CARREGAR ── */
@@ -607,7 +612,8 @@ function carregar() {
 
       lista.innerHTML = html || '<li style="background:transparent;border:none"><div class="lista-vazia">🌸 Nenhuma despesa ainda</div></li>';
       document.getElementById("total").innerText = "R$ " + total.toFixed(2);
-    });
+    })
+    .catch(err => console.error("Erro ao carregar:", err));
 }
 
 /* ── ADICIONAR ── */
@@ -626,13 +632,14 @@ function adicionar() {
     document.getElementById("desc").value = "";
     document.getElementById("val").value  = "";
     carregar();
-  });
+  }).catch(err => alert("Erro ao adicionar: " + err.message));
 }
 
 /* ── REMOVER ── */
 function remover(id) {
   if (!confirm("Remover esta despesa?")) return;
-  db.collection("despesas").doc(id).delete().then(() => carregar());
+  db.collection("despesas").doc(id).delete().then(() => carregar())
+    .catch(err => alert("Erro ao remover: " + err.message));
 }
 </script>
 </body>
